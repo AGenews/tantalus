@@ -1,12 +1,29 @@
 #!/usr/bin/python
 
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#  
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#  
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+#  MA 02110-1301, USA.
+#  
+
+
+
+
 from Tkinter import *
 import Tkinter, Tkconstants, tkFileDialog, time  
 import ConfigParser
-#import locale
-#import atexit
 global version_info
-version_info="v0.3 'Pleasant Pheasant'"
+version_info="v0.4 'Quixotic Quail'"
 
 config = ConfigParser.RawConfigParser()
 global sessionlength, sampleinterval, timebin, locale_var
@@ -14,6 +31,7 @@ global freezingon
 global diggingon
 global anythingon
 global startbutton
+global resetbutton
 
 
 if config.read('tantalus_config.cfg'):
@@ -39,17 +57,12 @@ class logger(Tkinter.Frame):
 	
 	#TIMING VARS
 	global sessionlength
-	#sessionlength=10
 	global sampleinterval
-	#sampleinterval=10
 	global number_of_samples
 	number_of_samples=(sessionlength*1000)/sampleinterval
 	global samplecount
 	samplecount=0
 	global timebin
-	#timebin=1
-	global samplesperbin
-	samplesperbin=(timebin*1000)/sampleinterval
 	
 	#EVENT VARS
 	global freeze_var
@@ -101,6 +114,7 @@ class logger(Tkinter.Frame):
 	#CONFIG VARS
 
 	global startbutton
+	global resetbutton
 	global locale_var, freezingon, diggingon, anythingon
 	global var1, var2, var3
 	var1 = 1
@@ -213,7 +227,6 @@ class logger(Tkinter.Frame):
 		global sessionlength
 		global number_of_samples
 		global samplecount
-		global samplesperbin
 		global freeze_latency_toggle
 		global dig_latency_toggle
 		global any_latency_toggle
@@ -221,6 +234,7 @@ class logger(Tkinter.Frame):
 		global dig_latency
 		global any_latency
 		global locale_var
+		global resetbutton
 				
 		sessionlength=int(sessionlength)
 		samplecount=float(samplecount)
@@ -270,15 +284,17 @@ class logger(Tkinter.Frame):
 			if (cumulative_any_data==0 and sum(percentage_any)==0 and old_any_var==0 and any_var==1 and any_latency_toggle==0):
 				any_latency=timestep
 				any_latency_toggle=1
-				
-			#print str(timestep)+"\t"+str(samplecount)+"\t"+str(cumulative_any_data)+"\t"+str(cumulative_dig_data)+"\t"+str(cumulative_freeze_data)+"\t"+str(any_var)+"\t"+str(dig_var)+"\t"+str(freeze_var)
+			
+			##DEBUGGING LINE	
+			print str(timestep)+"\t"+str(samplecount)+"\t"+str(cumulative_any_data)+"\t"+str(cumulative_dig_data)+"\t"+str(cumulative_freeze_data)+"\t"+str(any_var)+"\t"+str(dig_var)+"\t"+str(freeze_var)
+			##
 			
 			old_freeze_var=freeze_var
 			old_dig_var=dig_var
 			old_any_var=any_var
 			
 						
-			if timestep>timebin+counter*timebin:	
+			if timestep>=timebin+counter*timebin:	
 				freeze_data=round( (cumulative_freeze_data/samplecount)*100 ,2)
 				dig_data=round( (cumulative_dig_data/samplecount)*100 ,2)
 				any_data=round( (cumulative_any_data/samplecount)*100 ,2)
@@ -299,6 +315,10 @@ class logger(Tkinter.Frame):
 			self._start = time.time()         
 			self._elapsedtime = 0.0    
 			self._setTime(self._elapsedtime)
+		
+		if (sum(percentage_dig)+sum(percentage_freeze)+cumulative_any_data+cumulative_dig_data+cumulative_freeze_data)!=0:
+			resetbutton.configure(activebackground="yellow", bg='yellow')
+			
 					
 			
 	def Start(self): #We start the whole thing and display some errors
@@ -340,12 +360,13 @@ class logger(Tkinter.Frame):
     
 	def Reset(self):    #A Reset is done, hopefully the data is also resetted?   
 		#TIMING VARS
+		global sessionlength
+		global sampleinterval
+		global number_of_samples
+		number_of_samples=(sessionlength*1000)/sampleinterval
 		global samplecount
 		samplecount=0
-		#global timebin
-		#timebin=1
-		global samplesperbin
-		samplesperbin=(timebin*1000)/sampleinterval
+		global timebin
 		
 		#EVENT VARS
 		global freeze_var
@@ -359,7 +380,7 @@ class logger(Tkinter.Frame):
 		global any_var
 		any_var=0
 		global old_any_var
-		any_dig_var=0
+		old_any_var=0
 		global freeze_latency_toggle
 		freeze_latency_toggle=0
 		global dig_latency_toggle
@@ -403,11 +424,13 @@ class logger(Tkinter.Frame):
 		dig_latency_str=""
 		freeze_latency_str=""
 		any_latency_str=""
+		global resetbutton
 				          
 		""" Reset the stopwatch. """
 		self._start = time.time()         
 		self._elapsedtime = 0.0    
-		self._setTime(self._elapsedtime)                   
+		self._setTime(self._elapsedtime)   
+		resetbutton.configure(activebackground=defaultbg, bg=defaultbg)                
     	
     
 	def _setTime(self, elap):	#Only to have a nice time display
@@ -802,10 +825,12 @@ def main():
 	buttonframe = Frame(root, width=300, height=50)
 	Button(buttonframe, text='Show Data', command=lo.Analyze).pack(side=LEFT)
 	global startbutton
+	global resetbutton
 	startbutton=Button(buttonframe, text='Start', command=lo.Start)
-	startbutton.pack(side=LEFT)	#some buttons
+	startbutton.pack(side=LEFT)
 	Button(buttonframe, text='Stop', command=lo.Stop).pack(side=LEFT)
-	Button(buttonframe, text='Reset', command=lo.Reset).pack(side=LEFT)
+	resetbutton=Button(buttonframe, text='Reset', command=lo.Reset)
+	resetbutton.pack(side=LEFT)
 	Button(buttonframe, text='Quit', command=root.quit).pack(side=LEFT)
 	buttonframe.pack()
 	
