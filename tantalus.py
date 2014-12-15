@@ -15,6 +15,7 @@
 #  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 #  MA 02110-1301, USA.
 #  
+#	https://github.com/AGenews/tantalus
 
 
 
@@ -23,7 +24,7 @@ from Tkinter import *
 import Tkinter, Tkconstants, tkFileDialog, time  
 import ConfigParser
 global version_info
-version_info="v0.4 'Quixotic Quail'"
+version_info="v0.5 'Recondite Reindeer'"
 
 config = ConfigParser.RawConfigParser()
 global sessionlength, sampleinterval, timebin, locale_var
@@ -285,9 +286,13 @@ class logger(Tkinter.Frame):
 				any_latency=timestep
 				any_latency_toggle=1
 			
-			##DEBUGGING LINE	
-			print str(timestep)+"\t"+str(samplecount)+"\t"+str(cumulative_any_data)+"\t"+str(cumulative_dig_data)+"\t"+str(cumulative_freeze_data)+"\t"+str(any_var)+"\t"+str(dig_var)+"\t"+str(freeze_var)
-			##
+			################
+			##DEBUGGING LINE
+			################
+				
+			##print str(timestep)+"\t"+str(samplecount)+"\t"+str(cumulative_any_data)+"\t"+str(cumulative_dig_data)+"\t"+str(cumulative_freeze_data)+"\t"+str(any_var)+"\t"+str(dig_var)+"\t"+str(freeze_var)
+			
+			################
 			
 			old_freeze_var=freeze_var
 			old_dig_var=dig_var
@@ -524,16 +529,26 @@ class logger(Tkinter.Frame):
 			menubar = Menu(top)
 			menubar.add_command(label="Save", command=saveasf)
 			S = Scrollbar(top)
-			lines=len(percentage_time)+2
-			T = Text(top, height=lines, width=40)
+			lines=len(percentage_time)+4
+			T = Text(top, height=lines, width=20)
+			D = Text(top, height=lines, width=40)
 			S.pack(side=RIGHT, fill=Y)
 			T.pack(side=LEFT, fill=Y)
+			D.pack(side=LEFT, fill=Y)
 			S.config(command=T.yview)
 			T.config(yscrollcommand=S.set)
-			T.insert(END,"[Time Bins (s)]"+"\t"+"\t"+"[% Freezing]"+"\n")
-			for w,x in zip(percentage_time_str,percentage_freeze_str):
-				T.insert(END, str(w)+"\t"+"\t"+str(x)+"\n")
-			T.insert(END,"Latency to freeze (s):"+"\t"+str(freeze_latency_str))
+			D.config(yscrollcommand=S.set)
+			T.insert(END,"[Time Bins (s)]"+"\n")
+			T.insert(END,"\n")
+			for w in percentage_time_str:
+				T.insert(END, str(w)+"\n")
+					
+			D.insert(END,"[% Freezing]"+"\n")
+			D.insert(END,"\n")
+			for x in percentage_freeze_str:
+				D.insert(END, str(x)+"\n")
+			D.insert(END,"\n")	
+			D.insert(END,"Latency to freeze (s):"+"\t"+str(freeze_latency_str))
 			top.config(menu=menubar)
 		
 		if var2.get()==1:	
@@ -542,36 +557,91 @@ class logger(Tkinter.Frame):
 			menubar = Menu(top)
 			menubar.add_command(label="Save", command=saveasd)
 			S = Scrollbar(top)
-			lines=len(percentage_time)+2
-			T = Text(top, height=lines, width=40)
+			lines=len(percentage_time)+4
+			T = Text(top, height=lines, width=20)
+			D = Text(top, height=lines, width=40)
 			S.pack(side=RIGHT, fill=Y)
 			T.pack(side=LEFT, fill=Y)
+			D.pack(side=LEFT, fill=Y)
 			S.config(command=T.yview)
 			T.config(yscrollcommand=S.set)
-			T.insert(END,"[Time Bins]"+"\t"+"\t"+"[% Digging]"+"\n")
-			for w,x in zip(percentage_time_str,percentage_dig_str):
-				T.insert(END, str(w)+"\t"+"\t"+str(x)+"\n")
-			T.insert(END,"Latency to dig (s):"+"\t"+str(dig_latency_str))
+			D.config(yscrollcommand=S.set)
+			T.insert(END,"[Time Bins (s)]"+"\n")
+			T.insert(END,"\n")
+			for w in percentage_time_str:
+				T.insert(END, str(w)+"\n")
+					
+			D.insert(END,"[% Digging]"+"\n")
+			D.insert(END,"\n")
+			for x in percentage_dig_str:
+				D.insert(END, str(x)+"\n")
+			D.insert(END,"\n")	
+			D.insert(END,"Latency to dig (s):"+"\t"+str(dig_latency_str))
 			top.config(menu=menubar)
-		
-	
+					
+		#if var2.get()==1:	
+			#top = Toplevel()
+			#top.title("Digging")
+			#menubar = Menu(top)
+			#menubar.add_command(label="Save", command=saveasd)
+			#S = Scrollbar(top)
+			#lines=len(percentage_time)+2
+			#T = Text(top, height=lines, width=40)
+			#S.pack(side=RIGHT, fill=Y)
+			#T.pack(side=LEFT, fill=Y)
+			#S.config(command=T.yview)
+			#T.config(yscrollcommand=S.set)
+			#T.insert(END,"[Time Bins]"+"\t"+"\t"+"[% Digging]"+"\n")
+			#for w,x in zip(percentage_time_str,percentage_dig_str):
+				#T.insert(END, str(w)+"\t"+"\t"+str(x)+"\n")
+			#T.insert(END,"Latency to dig (s):"+"\t"+str(dig_latency_str))
+			#top.config(menu=menubar)
+
 		if var3.get()==1:	
 			top = Toplevel()
 			top.title("Anything")
 			menubar = Menu(top)
 			menubar.add_command(label="Save", command=saveasa)
 			S = Scrollbar(top)
-			lines=len(percentage_time)+2
-			T = Text(top, height=lines, width=40)
+			lines=len(percentage_time)+4
+			T = Text(top, height=lines, width=20)
+			D = Text(top, height=lines, width=40)
 			S.pack(side=RIGHT, fill=Y)
 			T.pack(side=LEFT, fill=Y)
+			D.pack(side=LEFT, fill=Y)
 			S.config(command=T.yview)
 			T.config(yscrollcommand=S.set)
-			T.insert(END,"[Time Bins]"+"\t"+"\t"+"[% Anything]"+"\n")
-			for w,x in zip(percentage_time_str,percentage_any_str):
-				T.insert(END, str(w)+"\t"+"\t"+str(x)+"\n")
-			T.insert(END,"Latency to anything (s):"+"\t"+str(any_latency_str))
-			top.config(menu=menubar)
+			D.config(yscrollcommand=S.set)
+			T.insert(END,"[Time Bins (s)]"+"\n")
+			T.insert(END,"\n")
+			for w in percentage_time_str:
+				T.insert(END, str(w)+"\n")
+					
+			D.insert(END,"[% Anything]"+"\n")
+			D.insert(END,"\n")	
+			for x in percentage_any_str:
+				D.insert(END, str(x)+"\n")
+			D.insert(END,"\n")	
+			D.insert(END,"Latency to anything (s):"+"\t"+str(any_latency_str))
+			top.config(menu=menubar)		
+	
+		#if var3.get()==1:	
+			#top = Toplevel()
+			#top.title("Anything")
+			#menubar = Menu(top)
+			#menubar.add_command(label="Save", command=saveasa)
+			#S = Scrollbar(top)
+			#lines=len(percentage_time)+2
+			#T = Text(top, height=lines, width=40)
+			#S.pack(side=RIGHT, fill=Y)
+			#T.pack(side=LEFT, fill=Y)
+			#S.config(command=T.yview)
+			#T.config(yscrollcommand=S.set)
+			#T.insert(END,"[Time Bins]"+"\t"+"\t"+"[% Anything]"+"\n")
+			#for w,x in zip(percentage_time_str,percentage_any_str):
+				#T.insert(END, str(w)+"\t"+"\t"+str(x)+"\n")
+			#T.insert(END,"Latency to anything (s):"+"\t"+str(any_latency_str))
+			#top.config(menu=menubar)
 		
 
 			
@@ -579,7 +649,7 @@ class logger(Tkinter.Frame):
 		top = Toplevel()
 		top.title("About")
 		msg = Message(top, font=('arial', 10, 'normal'), text="This software has been designed and" 
-		" is maintained by Andreas J. Genewsky (2014)"+"\n"+version_info, width=300)
+		" is maintained by Andreas J. Genewsky (2014). Original and up-to-date version can be found at https://github.com/AGenews/tantalus"+"\n"+version_info, width=300)
 		msg.pack()
 		button = Button(top, text="Ok", command=top.destroy)
 		button.pack()
@@ -768,6 +838,8 @@ def main():
 	lo.pack(side=TOP)
 	global defaultbg
 	defaultbg = root.cget('bg')
+	global startbutton
+	global resetbutton
 	
 	
 	def fkeyon(event): #Here we detect the Key pressed event
@@ -811,6 +883,20 @@ def main():
 		if var3.get()==1:
 			b.config(state=DISABLED,relief=RAISED,activebackground="white",activeforeground="black" \
 			,disabledforeground="black",bg="white",foreground="black")
+		
+	def keystart(event):
+		lo.Start()
+	
+	def keystop(event):
+		lo.Stop()
+
+	def keyreset(event): 
+		lo.Reset()
+		
+	def keyshow(event): 
+		lo.Analyze()
+
+
 	
 	frame = Frame(root, width=300, height=0)
 	frame.focus_set()
@@ -820,18 +906,21 @@ def main():
 	frame.bind("<KeyRelease-d>", dkeyoff)
 	frame.bind("<a>", akeyon)
 	frame.bind("<KeyRelease-a>", akeyoff)
+	frame.bind("<space>", keystart)
+	frame.bind("<b>", keystop)
+	frame.bind("<r>", keyreset)
+	frame.bind("<n>", keyshow)
+	frame.bind("<q>", root.quit)
 	frame.pack()
 	
 	buttonframe = Frame(root, width=300, height=50)
-	Button(buttonframe, text='Show Data', command=lo.Analyze).pack(side=LEFT)
-	global startbutton
-	global resetbutton
-	startbutton=Button(buttonframe, text='Start', command=lo.Start)
+	Button(buttonframe, text='Show Data\n(n)', command=lo.Analyze).pack(side=LEFT)
+	startbutton=Button(buttonframe, text='Start\n(space)', command=lo.Start)
 	startbutton.pack(side=LEFT)
-	Button(buttonframe, text='Stop', command=lo.Stop).pack(side=LEFT)
-	resetbutton=Button(buttonframe, text='Reset', command=lo.Reset)
+	Button(buttonframe, text='Stop\n(b)', command=lo.Stop).pack(side=LEFT)
+	resetbutton=Button(buttonframe, text='Reset\n(r)', command=lo.Reset)
 	resetbutton.pack(side=LEFT)
-	Button(buttonframe, text='Quit', command=root.quit).pack(side=LEFT)
+	Button(buttonframe, text='Quit \n', command=root.quit).pack(side=LEFT)
 	buttonframe.pack()
 	
 	menubar = Menu(root)
