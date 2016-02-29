@@ -18,6 +18,8 @@
 #	https://github.com/AGenews/tantalus
 
 
+# What we need is a data file which contain all the data.
+# What we need is the possibility to give the variables names<
 
 
 from Tkinter import *
@@ -110,7 +112,40 @@ class logger(Tkinter.Frame):
 	dig_latency=float(sessionlength)
 	global any_latency
 	any_latency=float(sessionlength)
-
+	
+	global fstart 
+	fstart = 0.0
+	global dstart 
+	dstart = 0.0
+	global astart 
+	astart = 0.0
+	
+	global fend 
+	fend = 0.0
+	global dend 
+	dend = 0.0
+	global aend
+	aend = 0.0
+	
+	global founter 
+	founter = 0
+	global dounter
+	dounter = 0
+	global aounter
+	aounter = 0
+	global ffinished
+	ffinished = 0
+	global dfinished
+	dfinished = 0
+	global afinished
+	afinished = 0
+	
+	global fountar
+	fountar = []
+	global dountar
+	dountar = []
+	global aountar
+	aountar = []
 	
 	#CONFIG VARS
 
@@ -138,6 +173,9 @@ class logger(Tkinter.Frame):
 		options['initialfile'] = 'myfile.txt'
 		
 		global butts, sessleng, sampinter, timbi, separator
+		global fountar
+		global dountar
+		global aountar
 		butts="To score FREEZING press <f>"
 		digg="To score DIGGING press <d>"
 		anythingelse="To score ANYTHINGELSE press <a>"
@@ -236,6 +274,23 @@ class logger(Tkinter.Frame):
 		global any_latency
 		global locale_var
 		global resetbutton
+		
+		global fstart 
+		global dstart 
+		global astart 
+		global fend 
+		global dend 
+		global aend		
+		global founter 
+		global dounter
+		global aounter
+		global ffinished
+		global dfinished
+		global afinished
+		global fountar
+		global dountar
+		global aountar
+		
 				
 		sessionlength=int(sessionlength)
 		samplecount=float(samplecount)
@@ -274,7 +329,47 @@ class logger(Tkinter.Frame):
 				cumulative_any_data=cumulative_any_data+0
 			else: 
 				cumulative_any_data=cumulative_any_data+old_any_var
+				
+			# In order to also have some measure of how often something 
+			# appeared, we need a new method here.
+			# unfortunately the keys don't stay pressed
+			# which means we would need at least two downstates to be 
+			# sure. Something like 1-0-0
+			# 
+			# Well, one could also think about just writing down the
+			# on/off event times
 			
+			
+			if (old_freeze_var==0) and (freeze_var==1):
+				fstart=time.time()
+			if (old_dig_var==0) and (dig_var==1):
+				dstart=time.time()
+			if (old_any_var==0) and (any_var==1):
+				astart=time.time()
+				
+			if (old_freeze_var==1) and (freeze_var==0):
+				fend=time.time()
+				if(fend-fstart)>0.05:
+					ffinished = 1
+			if (old_dig_var==1) and (dig_var==0):
+				dend=time.time()
+				if(dend-dstart)>0.05:
+					dfinished = 1
+			if (old_any_var==1) and (any_var==0):
+				aend=time.time()
+				if(aend-astart)>0.05:
+					afinished = 1
+					
+			if (old_freeze_var==0) and (freeze_var==0) and (ffinished==1):
+				founter=founter+1
+				ffinished = 0
+			if (old_dig_var==0) and (dig_var==0) and (dfinished ==1):
+				dounter=dounter+1
+				dfinished = 0
+			if (old_any_var==0) and (any_var==0) and (afinished ==1):
+				aounter=aounter+1
+				afinished = 0
+				
 			
 			if (cumulative_freeze_data==0 and sum(percentage_freeze)==0 and old_freeze_var==0 and freeze_var==1 and freeze_latency_toggle==0):
 				freeze_latency=timestep
@@ -291,7 +386,7 @@ class logger(Tkinter.Frame):
 			################
 				
 			##print str(timestep)+"\t"+str(samplecount)+"\t"+str(cumulative_any_data)+"\t"+str(cumulative_dig_data)+"\t"+str(cumulative_freeze_data)+"\t"+str(any_var)+"\t"+str(dig_var)+"\t"+str(freeze_var)
-			
+			##print str(founter)+"\t"+str(dounter)+"\t"+str(aounter)
 			################
 			
 			old_freeze_var=freeze_var
@@ -308,11 +403,17 @@ class logger(Tkinter.Frame):
 				percentage_dig.append(dig_data)
 				percentage_any.append(any_data)
 				percentage_time.append(time_data)
+				fountar.append(founter)
+				dountar.append(dounter)
+				aountar.append(aounter)
 				cumulative_freeze_data=0
 				cumulative_dig_data=0
 				cumulative_any_data=0
 				counter += 1
 				samplecount=0
+				founter = 0
+				dounter = 0
+				aounter = 0
 				
 		else:
 			logger.Stop(self)
@@ -430,6 +531,40 @@ class logger(Tkinter.Frame):
 		freeze_latency_str=""
 		any_latency_str=""
 		global resetbutton
+		
+		global fstart 
+		fstart = 0.0
+		global dstart 
+		dstart = 0.0
+		global astart 
+		astart = 0.0
+		
+		global fend 
+		fend = 0.0
+		global dend 
+		dend = 0.0
+		global aend
+		aend = 0.0
+		
+		global founter 
+		founter = 0
+		global dounter
+		dounter = 0
+		global aounter
+		aounter = 0
+		global ffinished
+		ffinished = 0
+		global dfinished
+		dfinished = 0
+		global afinished
+		afinished = 0
+		
+		global fountar
+		fountar = []
+		global dountar
+		dountar = []
+		global aountar
+		aounter = []
 				          
 		""" Reset the stopwatch. """
 		self._start = time.time()         
@@ -461,6 +596,16 @@ class logger(Tkinter.Frame):
 		dig_latency_str=""
 		freeze_latency_str=""
 		any_latency_str=""
+		global fountar
+		global dountar
+		global aountar
+		global fountar_str
+		fountar_str=[]
+		global dountar_str
+		dountar_str=[]
+		global aountar_str
+		aountar_str=[]
+		
 		
 		
 		if locale_var=="Comma":
@@ -468,11 +613,15 @@ class logger(Tkinter.Frame):
 			freeze_latency_str=str(freeze_latency).replace(".", ",")
 			any_latency_str=str(any_latency).replace(".", ",")
 			
+			
 			for x in range(0,(len(percentage_time)) ):
 				percentage_any_str.append(str(percentage_any[x]).replace(".", ","))
 				percentage_time_str.append(str(percentage_time[x]).replace(".", ","))
 				percentage_freeze_str.append(str(percentage_freeze[x]).replace(".", ","))
 				percentage_dig_str.append(str(percentage_dig[x]).replace(".", ","))
+				fountar_str.append(str(fountar[x]).replace(".", ","))
+				dountar_str.append(str(dountar[x]).replace(".", ","))
+				aountar_str.append(str(aountar[x]).replace(".", ","))
 				
 		if locale_var=="Point":
 			dig_latency_str=str(dig_latency).replace(",", ".")
@@ -484,7 +633,9 @@ class logger(Tkinter.Frame):
 				percentage_time_str.append(str(percentage_time[x]).replace(",", "."))
 				percentage_freeze_str.append(str(percentage_freeze[x]).replace(",", "."))
 				percentage_dig_str.append(str(percentage_dig[x]).replace(",", "."))
-
+				fountar_str.append(str(fountar[x]).replace(",", "."))
+				dountar_str.append(str(dountar[x]).replace(",", "."))
+				aountar_str.append(str(aountar[x]).replace(",", "."))
 
 		
 		def saveasf():
@@ -493,9 +644,9 @@ class logger(Tkinter.Frame):
 			options['initialfile'] = 'freezing_.txt'
 			filename = tkFileDialog.asksaveasfilename(**self.file_opt)
 			myFile=open(filename,"w")
-			myFile.write("[Time Bins]"+"\t"+"[% Freezing]"+"\n")
-			for w,x in zip(percentage_time_str,percentage_freeze_str):
-				myFile.write(str(w)+"\t"+"\t"+str(x)+"\n")
+			myFile.write("[Time Bins]"+"\t"+"[% Freezing]"+"\t"+"[Events]"+"\n")
+			for w,x,y in zip(percentage_time_str,percentage_freeze_str,fountar_str):
+				myFile.write(str(w)+"\t"+"\t"+str(x)+"\t"+"\t"+str(y)+"\n")
 			myFile.write("Latency to freeze (s):"+"\t"+str(freeze_latency_str))
 			myFile.close()	
 			
@@ -505,9 +656,9 @@ class logger(Tkinter.Frame):
 			options['initialfile'] = 'digging_.txt'
 			filename = tkFileDialog.asksaveasfilename(**self.file_opt)
 			myFile=open(filename,"w")
-			myFile.write("[Time Bins]"+"\t"+"[% Digging]"+"\n")
-			for w,x in zip(percentage_time_str,percentage_dig_str):
-				myFile.write(str(w)+"\t"+"\t"+str(x)+"\n")
+			myFile.write("[Time Bins]"+"\t"+"[% Digging]"+"\t"+"[Events]"+"\n")
+			for w,x,y in zip(percentage_time_str,percentage_dig_str,dountar_str):
+				myFile.write(str(w)+"\t"+"\t"+str(x)+"\t"+"\t"+str(y)+"\n")
 			myFile.write("Latency to dig (s):"+"\t"+str(dig_latency_str))
 			myFile.close()	
 			
@@ -517,9 +668,9 @@ class logger(Tkinter.Frame):
 			options['initialfile'] = 'anything_.txt'
 			filename = tkFileDialog.asksaveasfilename(**self.file_opt)
 			myFile=open(filename,"w")
-			myFile.write("[Time Bins]"+"\t"+"[% Anything]"+"\n")
-			for w,x in zip(percentage_time_str,percentage_any_str):
-				myFile.write(str(w)+"\t"+"\t"+str(x)+"\n")
+			myFile.write("[Time Bins]"+"\t"+"[% Anything]"+"\t"+"[Events]"+"\n")
+			for w,x,y in zip(percentage_time_str,percentage_any_str,aountar_str):
+				myFile.write(str(w)+"\t"+"\t"+str(x)+"\t"+"\t"+str(y)+"\n")
 			myFile.write("Latency to anything (s):"+"\t"+str(any_latency_str))
 			myFile.close()	
 		
@@ -532,12 +683,15 @@ class logger(Tkinter.Frame):
 			lines=len(percentage_time)+4
 			T = Text(top, height=lines, width=20)
 			D = Text(top, height=lines, width=40)
+			E = Text(top, height=lines, width=10)
 			S.pack(side=RIGHT, fill=Y)
 			T.pack(side=LEFT, fill=Y)
 			D.pack(side=LEFT, fill=Y)
+			E.pack(side=LEFT, fill=Y)
 			S.config(command=T.yview)
 			T.config(yscrollcommand=S.set)
 			D.config(yscrollcommand=S.set)
+			E.config(yscrollcommand=S.set)
 			T.insert(END,"[Time Bins (s)]"+"\n")
 			T.insert(END,"\n")
 			for w in percentage_time_str:
@@ -549,6 +703,12 @@ class logger(Tkinter.Frame):
 				D.insert(END, str(x)+"\n")
 			D.insert(END,"\n")	
 			D.insert(END,"Latency to freeze (s):"+"\t"+str(freeze_latency_str))
+			
+			E.insert(END,"[Events]"+"\n")
+			E.insert(END,"\n")
+			for y in fountar_str:
+				E.insert(END, str(y)+"\n")
+			
 			top.config(menu=menubar)
 		
 		if var2.get()==1:	
@@ -560,12 +720,15 @@ class logger(Tkinter.Frame):
 			lines=len(percentage_time)+4
 			T = Text(top, height=lines, width=20)
 			D = Text(top, height=lines, width=40)
+			E = Text(top, height=lines, width=10)
 			S.pack(side=RIGHT, fill=Y)
 			T.pack(side=LEFT, fill=Y)
 			D.pack(side=LEFT, fill=Y)
+			E.pack(side=LEFT, fill=Y)
 			S.config(command=T.yview)
 			T.config(yscrollcommand=S.set)
 			D.config(yscrollcommand=S.set)
+			E.config(yscrollcommand=S.set)
 			T.insert(END,"[Time Bins (s)]"+"\n")
 			T.insert(END,"\n")
 			for w in percentage_time_str:
@@ -577,6 +740,12 @@ class logger(Tkinter.Frame):
 				D.insert(END, str(x)+"\n")
 			D.insert(END,"\n")	
 			D.insert(END,"Latency to dig (s):"+"\t"+str(dig_latency_str))
+			
+			E.insert(END,"[Events]"+"\n")
+			E.insert(END,"\n")
+			for y in dountar_str:
+				E.insert(END, str(y)+"\n")
+			
 			top.config(menu=menubar)
 					
 		#if var2.get()==1:	
@@ -606,12 +775,15 @@ class logger(Tkinter.Frame):
 			lines=len(percentage_time)+4
 			T = Text(top, height=lines, width=20)
 			D = Text(top, height=lines, width=40)
+			E = Text(top, height=lines, width=10)
 			S.pack(side=RIGHT, fill=Y)
 			T.pack(side=LEFT, fill=Y)
 			D.pack(side=LEFT, fill=Y)
+			E.pack(side=LEFT, fill=Y)
 			S.config(command=T.yview)
 			T.config(yscrollcommand=S.set)
 			D.config(yscrollcommand=S.set)
+			E.config(yscrollcommand=S.set)
 			T.insert(END,"[Time Bins (s)]"+"\n")
 			T.insert(END,"\n")
 			for w in percentage_time_str:
@@ -623,6 +795,12 @@ class logger(Tkinter.Frame):
 				D.insert(END, str(x)+"\n")
 			D.insert(END,"\n")	
 			D.insert(END,"Latency to anything (s):"+"\t"+str(any_latency_str))
+			
+			E.insert(END,"[Events]"+"\n")
+			E.insert(END,"\n")
+			for y in aountar_str:
+				E.insert(END, str(y)+"\n")
+			
 			top.config(menu=menubar)		
 	
 		#if var3.get()==1:	
@@ -766,13 +944,13 @@ Andreas Genewsky (October 2014)
 		button = Button(top, text="Ok", command=on_button_click)
 		button.bind("<Button-1>", on_button_click) 
 		button.pack()
-	
+
 	def saveas(self):
 		filename = tkFileDialog.asksaveasfilename(**self.file_opt)
 		myFile=open(filename,"w")
 		myFile.write("[Time Bins]"+"\t"+"[% Anything]"+"\t"+"[% Freezing]"+"\t"+"[% Digging]"+"\n")
-		for w,x,y,z in zip(percentage_time_str,percentage_any_str,percentage_freeze_str,percentage_dig_str):
-			myFile.write(str(w)+"\t"+"\t"+str(x)+"\t"+"\t"+str(y)+"\t"+"\t"+str(z)+"\n")
+		for w,x,a,y,b,z,c in zip(percentage_time_str,percentage_any_str,aountar_str,percentage_freeze_str,fountar_str,percentage_dig_str,dountar_str):
+			myFile.write(str(w)+"\t"+"\t"+str(x)+"\t"+"\t"+str(a)+"\t"+"\t"+str(y)+"\t"+"\t"+str(b)+"\t"+"\t"+str(z)+"\t"+"\t"+str(c)+"\n")
 		myFile.write("Latency to freeze (s):"+"\t"+str(freeze_latency_str)+"\n")
 		myFile.write("Latency to dig (s):"+"\t"+str(dig_latency_str)+"\n")
 		myFile.write("Latency to anything (s):"+"\t"+str(any_latency_str)+"\n")
