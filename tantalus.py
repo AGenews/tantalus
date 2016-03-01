@@ -26,7 +26,7 @@ from Tkinter import *
 import Tkinter, Tkconstants, tkFileDialog, time  
 import ConfigParser
 global version_info
-version_info="v0.5 'Recondite Reindeer'"
+version_info="v0.6 'Playful Platypus'"
 
 config = ConfigParser.RawConfigParser()
 global sessionlength, sampleinterval, timebin, locale_var
@@ -146,6 +146,20 @@ class logger(Tkinter.Frame):
 	dountar = []
 	global aountar
 	aountar = []
+	
+	global fts
+	fts = 0.0
+	global dts
+	dts = 0.0
+	global ats
+	ats = 0.0
+		
+	global ftime
+	ftime = []
+	global dtime
+	dtime = []
+	global atime
+	atime = []
 	
 	#CONFIG VARS
 
@@ -290,6 +304,12 @@ class logger(Tkinter.Frame):
 		global fountar
 		global dountar
 		global aountar
+		global fts
+		global dts
+		global ats		
+		global ftime
+		global dtime
+		global atime
 		
 				
 		sessionlength=int(sessionlength)
@@ -361,12 +381,15 @@ class logger(Tkinter.Frame):
 					afinished = 1
 					
 			if (old_freeze_var==0) and (freeze_var==0) and (ffinished==1):
+				fts = fts + (fend-fstart)
 				founter=founter+1
 				ffinished = 0
 			if (old_dig_var==0) and (dig_var==0) and (dfinished ==1):
+				dts = dts + (dend-dstart)
 				dounter=dounter+1
 				dfinished = 0
 			if (old_any_var==0) and (any_var==0) and (afinished ==1):
+				ats = ats + (aend-astart)
 				aounter=aounter+1
 				afinished = 0
 				
@@ -406,6 +429,18 @@ class logger(Tkinter.Frame):
 				fountar.append(founter)
 				dountar.append(dounter)
 				aountar.append(aounter)
+				if(founter != 0):
+					fts = (fts*1.0)/(founter*1.0)
+					fts = round(fts,3)
+				if(dounter != 0):	
+					dts = (dts*1.0)/(dounter*1.0)
+					dts = round(dts,3)
+				#if(aounter != 0):	
+				#	ats = (ats*1.0)/(aounter*1.0)
+				#	ats = round(ats,3)
+				ftime.append(fts)
+				dtime.append(dts)
+				atime.append(ats)				
 				cumulative_freeze_data=0
 				cumulative_dig_data=0
 				cumulative_any_data=0
@@ -414,6 +449,9 @@ class logger(Tkinter.Frame):
 				founter = 0
 				dounter = 0
 				aounter = 0
+				fts = 0.0
+				dts = 0.0
+				ats = 0.0
 				
 		else:
 			logger.Stop(self)
@@ -564,7 +602,21 @@ class logger(Tkinter.Frame):
 		global dountar
 		dountar = []
 		global aountar
-		aounter = []
+		aountar = []
+		
+		global fts
+		fts = 0.0
+		global dts
+		dts = 0.0
+		global ats
+		ats = 0.0
+				
+		global ftime
+		ftime = []
+		global dtime
+		dtime = []
+		global atime
+		atime = []
 				          
 		""" Reset the stopwatch. """
 		self._start = time.time()         
@@ -605,6 +657,18 @@ class logger(Tkinter.Frame):
 		dountar_str=[]
 		global aountar_str
 		aountar_str=[]
+		global fts
+		global dts
+		global ats		
+		global ftime
+		global dtime
+		global atime
+		global ftime_str
+		ftime_str=[]
+		global dtime_str
+		dtime_str=[]
+		global atime_str
+		atime_str=[]
 		
 		
 		
@@ -622,6 +686,9 @@ class logger(Tkinter.Frame):
 				fountar_str.append(str(fountar[x]).replace(".", ","))
 				dountar_str.append(str(dountar[x]).replace(".", ","))
 				aountar_str.append(str(aountar[x]).replace(".", ","))
+				ftime_str.append(str(ftime[x]).replace(".", ","))
+				dtime_str.append(str(dtime[x]).replace(".", ","))
+				atime_str.append(str(atime[x]).replace(".", ","))
 				
 		if locale_var=="Point":
 			dig_latency_str=str(dig_latency).replace(",", ".")
@@ -636,6 +703,9 @@ class logger(Tkinter.Frame):
 				fountar_str.append(str(fountar[x]).replace(",", "."))
 				dountar_str.append(str(dountar[x]).replace(",", "."))
 				aountar_str.append(str(aountar[x]).replace(",", "."))
+				ftime_str.append(str(ftime[x]).replace(",", "."))
+				dtime_str.append(str(dtime[x]).replace(",", "."))
+				atime_str.append(str(atime[x]).replace(",", "."))
 
 		
 		def saveasf():
@@ -644,9 +714,9 @@ class logger(Tkinter.Frame):
 			options['initialfile'] = 'freezing_.txt'
 			filename = tkFileDialog.asksaveasfilename(**self.file_opt)
 			myFile=open(filename,"w")
-			myFile.write("[Time Bins]"+"\t"+"[% Freezing]"+"\t"+"[Events]"+"\n")
-			for w,x,y in zip(percentage_time_str,percentage_freeze_str,fountar_str):
-				myFile.write(str(w)+"\t"+"\t"+str(x)+"\t"+"\t"+str(y)+"\n")
+			myFile.write("[Time Bins]"+"\t"+"[% Freezing]"+"\t"+"[Events]"+"\t"+"[EvTime]"+"\n")
+			for w,x,y,z in zip(percentage_time_str,percentage_freeze_str,fountar_str,ftime_str):
+				myFile.write(str(w)+"\t"+"\t"+str(x)+"\t"+"\t"+str(y)+"\t"+str(z)+"\n")
 			myFile.write("Latency to freeze (s):"+"\t"+str(freeze_latency_str))
 			myFile.close()	
 			
@@ -656,9 +726,9 @@ class logger(Tkinter.Frame):
 			options['initialfile'] = 'digging_.txt'
 			filename = tkFileDialog.asksaveasfilename(**self.file_opt)
 			myFile=open(filename,"w")
-			myFile.write("[Time Bins]"+"\t"+"[% Digging]"+"\t"+"[Events]"+"\n")
-			for w,x,y in zip(percentage_time_str,percentage_dig_str,dountar_str):
-				myFile.write(str(w)+"\t"+"\t"+str(x)+"\t"+"\t"+str(y)+"\n")
+			myFile.write("[Time Bins]"+"\t"+"[% Digging]"+"\t"+"[Events]"+"\t"+"[EvTime]"+"\n")
+			for w,x,y,z in zip(percentage_time_str,percentage_dig_str,dountar_str,dtime_str):
+				myFile.write(str(w)+"\t"+"\t"+str(x)+"\t"+"\t"+str(y)+"\t"+str(z)+"\n")
 			myFile.write("Latency to dig (s):"+"\t"+str(dig_latency_str))
 			myFile.close()	
 			
@@ -668,9 +738,9 @@ class logger(Tkinter.Frame):
 			options['initialfile'] = 'anything_.txt'
 			filename = tkFileDialog.asksaveasfilename(**self.file_opt)
 			myFile=open(filename,"w")
-			myFile.write("[Time Bins]"+"\t"+"[% Anything]"+"\t"+"[Events]"+"\n")
-			for w,x,y in zip(percentage_time_str,percentage_any_str,aountar_str):
-				myFile.write(str(w)+"\t"+"\t"+str(x)+"\t"+"\t"+str(y)+"\n")
+			myFile.write("[Time Bins]"+"\t"+"[% Anything]"+"\t"+"[Events]"+"\t"+"[EvTime]"+"\n")
+			for w,x,y,z in zip(percentage_time_str,percentage_any_str,aountar_str,atime_str):
+				myFile.write(str(w)+"\t"+"\t"+str(x)+"\t"+"\t"+str(y)+"\t"+str(z)+"\n")
 			myFile.write("Latency to anything (s):"+"\t"+str(any_latency_str))
 			myFile.close()	
 		
@@ -684,14 +754,17 @@ class logger(Tkinter.Frame):
 			T = Text(top, height=lines, width=20)
 			D = Text(top, height=lines, width=40)
 			E = Text(top, height=lines, width=10)
+			ET = Text(top, height=lines, width=10)
 			S.pack(side=RIGHT, fill=Y)
 			T.pack(side=LEFT, fill=Y)
 			D.pack(side=LEFT, fill=Y)
 			E.pack(side=LEFT, fill=Y)
+			ET.pack(side=LEFT, fill=Y)
 			S.config(command=T.yview)
 			T.config(yscrollcommand=S.set)
 			D.config(yscrollcommand=S.set)
 			E.config(yscrollcommand=S.set)
+			ET.config(yscrollcommand=S.set)
 			T.insert(END,"[Time Bins (s)]"+"\n")
 			T.insert(END,"\n")
 			for w in percentage_time_str:
@@ -709,6 +782,11 @@ class logger(Tkinter.Frame):
 			for y in fountar_str:
 				E.insert(END, str(y)+"\n")
 			
+			ET.insert(END,"[EvTime]"+"\n")
+			ET.insert(END,"\n")
+			for z in ftime_str:
+				ET.insert(END, str(z)+"\n")
+			
 			top.config(menu=menubar)
 		
 		if var2.get()==1:	
@@ -721,14 +799,17 @@ class logger(Tkinter.Frame):
 			T = Text(top, height=lines, width=20)
 			D = Text(top, height=lines, width=40)
 			E = Text(top, height=lines, width=10)
+			ET = Text(top, height=lines, width=10)
 			S.pack(side=RIGHT, fill=Y)
 			T.pack(side=LEFT, fill=Y)
 			D.pack(side=LEFT, fill=Y)
 			E.pack(side=LEFT, fill=Y)
+			ET.pack(side=LEFT, fill=Y)
 			S.config(command=T.yview)
 			T.config(yscrollcommand=S.set)
 			D.config(yscrollcommand=S.set)
 			E.config(yscrollcommand=S.set)
+			ET.config(yscrollcommand=S.set)
 			T.insert(END,"[Time Bins (s)]"+"\n")
 			T.insert(END,"\n")
 			for w in percentage_time_str:
@@ -745,6 +826,11 @@ class logger(Tkinter.Frame):
 			E.insert(END,"\n")
 			for y in dountar_str:
 				E.insert(END, str(y)+"\n")
+			
+			ET.insert(END,"[EvTime]"+"\n")
+			ET.insert(END,"\n")
+			for z in dtime_str:
+				ET.insert(END, str(z)+"\n")
 			
 			top.config(menu=menubar)
 					
@@ -776,14 +862,17 @@ class logger(Tkinter.Frame):
 			T = Text(top, height=lines, width=20)
 			D = Text(top, height=lines, width=40)
 			E = Text(top, height=lines, width=10)
+			ET = Text(top, height=lines, width=10)
 			S.pack(side=RIGHT, fill=Y)
 			T.pack(side=LEFT, fill=Y)
 			D.pack(side=LEFT, fill=Y)
 			E.pack(side=LEFT, fill=Y)
+			ET.pack(side=LEFT, fill=Y)
 			S.config(command=T.yview)
 			T.config(yscrollcommand=S.set)
 			D.config(yscrollcommand=S.set)
 			E.config(yscrollcommand=S.set)
+			ET.config(yscrollcommand=S.set)
 			T.insert(END,"[Time Bins (s)]"+"\n")
 			T.insert(END,"\n")
 			for w in percentage_time_str:
@@ -800,6 +889,11 @@ class logger(Tkinter.Frame):
 			E.insert(END,"\n")
 			for y in aountar_str:
 				E.insert(END, str(y)+"\n")
+			
+			ET.insert(END,"[EvTime]"+"\n")
+			ET.insert(END,"\n")
+			for z in atime_str:
+				ET.insert(END, str(z)+"\n")
 			
 			top.config(menu=menubar)		
 	
